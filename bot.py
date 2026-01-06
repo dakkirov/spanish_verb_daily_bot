@@ -33,7 +33,8 @@ LANGUAGES = {
     'portuguese': '🇧🇷 Portuguese', 
     'french': '🇫🇷 French',
     'italian': '🇮🇹 Italian',
-    'german': '🇩🇪 German'
+    'german': '🇩🇪 German',
+    'russian': '🇷🇺 Russian'
 }
 
 # Common timezones
