@@ -1,3 +1,4 @@
+import os
 import asyncio
 import logging
 import random
@@ -17,7 +18,7 @@ import database as db
 from verbs import VERBS, get_verb_by_index, get_random_verb, get_verb_count
 
 # Bot token
-BOT_TOKEN = "8591777399:AAGL3N481GjilQVUno1VdTEjSiK8fTIFIvI"
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 # Logging
 logging.basicConfig(
