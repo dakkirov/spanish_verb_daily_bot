@@ -5,11 +5,13 @@ import random
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.ext import (
     Application, 
     CommandHandler, 
     CallbackQueryHandler,
+    MessageHandler,
+    filters,
     ContextTypes,
     JobQueue
 )
@@ -17,7 +19,7 @@ from telegram.ext import (
 import database as db
 from verbs import VERBS, get_verb_by_index, get_random_verb, get_verb_count
 
-# Bot token
+# Bot token - use environment variable or fallback
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 # Logging
@@ -48,11 +50,28 @@ TIMEZONES = {
     'Europe/Paris': '🇫🇷 Paris',
     'Europe/Berlin': '🇩🇪 Berlin',
     'Asia/Tokyo': '🇯🇵 Tokyo',
+    'Europe/Moscow': '🇷🇺 Moscow',
     'UTC': '🌍 UTC'
 }
 
 # Time options
 TIME_OPTIONS = ['07:00', '08:00', '09:00', '10:00', '12:00', '18:00', '20:00', '21:00']
+
+# Help message
+HELP_MESSAGE = """🇦🇷 <b>Spanish Verb Bot</b>
+
+I help you learn Argentinian Spanish verbs with daily practice and quizzes!
+
+<b>Available Commands:</b>
+
+/start - Set up or reset your preferences
+/verb - Get a random verb with conjugations
+/quiz - Test yourself on verbs you've learned
+/stats - See your learning progress
+/settings - Change language, time, or timezone
+/help - Show this help message
+
+Just tap a command or use the menu button! 📚"""
 
 
 def format_verb_message(verb: dict, language: str) -> str:
@@ -112,6 +131,33 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "<b>What language should I translate verbs to?</b>",
         parse_mode='HTML',
         reply_markup=get_language_keyboard()
+    )
+
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /help command."""
+    await update.message.reply_text(HELP_MESSAGE, parse_mode='HTML')
+
+
+async def handle_unknown_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle any non-command text message."""
+    await update.message.reply_text(
+        "I only respond to commands! 🤖\n\n"
+        "Use the menu button or try these:\n\n"
+        "/verb - Get a verb\n"
+        "/quiz - Test yourself\n"
+        "/stats - Your progress\n"
+        "/settings - Preferences\n"
+        "/help - All commands"
+    )
+
+
+async def handle_file_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle file uploads (photos, documents, etc.)."""
+    await update.message.reply_text(
+        "I don't process files! 📁\n\n"
+        "I'm here to help you learn Spanish verbs.\n"
+        "Use /help to see available commands."
     )
 
 
@@ -260,7 +306,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Get recent verbs
     recent_indices = db.get_recent_verbs(user_id, limit=10)
     
-    if len(recent_indices) < 2:
+    if len(recent_indices) < 1:
         await update.message.reply_text(
             "You need to learn more verbs first! 📚\n"
             "Use /verb to get more verbs, then come back for the quiz."
@@ -303,15 +349,26 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     
     else:
-        # Ask for conjugation
+        # Ask for conjugation - USE SAME VERB for all options (harder!)
         tense = random.choice(['presente', 'pasado', 'futuro'])
         pronoun = random.choice(['yo', 'vos', 'él/ella'])
         correct_answer = quiz_verb[tense][pronoun]
         
-        # Get wrong answers
-        other_indices = [i for i in range(get_verb_count()) if i != quiz_verb_index]
-        wrong_indices = random.sample(other_indices, 3)
-        wrong_answers = [get_verb_by_index(i)[tense][pronoun] for i in wrong_indices]
+        # Get wrong answers from SAME verb, different tenses/pronouns
+        wrong_answers = []
+        all_tenses = ['presente', 'pasado', 'futuro']
+        all_pronouns = ['yo', 'vos', 'él/ella', 'nosotros', 'ustedes']
+        
+        # Collect all other conjugations from the same verb
+        other_conjugations = []
+        for t in all_tenses:
+            for p in all_pronouns:
+                conj = quiz_verb[t][p]
+                if conj != correct_answer and conj not in other_conjugations:
+                    other_conjugations.append(conj)
+        
+        # Pick 3 random wrong answers
+        wrong_answers = random.sample(other_conjugations, min(3, len(other_conjugations)))
         
         all_answers = [correct_answer] + wrong_answers
         random.shuffle(all_answers)
@@ -548,7 +605,20 @@ async def send_daily_verb_job(context: ContextTypes.DEFAULT_TYPE):
 
 
 async def post_init(app: Application):
-    """Schedule jobs for all existing users after bot starts."""
+    """Set up bot commands menu and schedule jobs after bot starts."""
+    # Set up the command menu
+    commands = [
+        BotCommand("start", "Set up or reset preferences"),
+        BotCommand("verb", "Get a random verb"),
+        BotCommand("quiz", "Test yourself"),
+        BotCommand("stats", "See your progress"),
+        BotCommand("settings", "Change preferences"),
+        BotCommand("help", "Show help message"),
+    ]
+    await app.bot.set_my_commands(commands)
+    logger.info("Bot commands menu set up")
+    
+    # Schedule jobs for all existing users
     users = db.get_all_active_users()
     for user in users:
         schedule_user_daily_verb(app, user)
@@ -563,17 +633,27 @@ def main():
     # Create application
     app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     
-    # Add handlers
+    # Add command handlers
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("verb", verb_command))
     app.add_handler(CommandHandler("quiz", quiz_command))
     app.add_handler(CommandHandler("stats", stats_command))
     app.add_handler(CommandHandler("settings", settings_command))
+    app.add_handler(CommandHandler("help", help_command))
     
     # Callback handlers
     app.add_handler(CallbackQueryHandler(handle_quiz_callback, pattern=r"^quiz_"))
     app.add_handler(CallbackQueryHandler(handle_settings_callback, pattern=r"^(settings_|setlang_|settime_|settz_)"))
     app.add_handler(CallbackQueryHandler(handle_onboarding_callback, pattern=r"^(lang_|tz_|time_)"))
+    
+    # Handle non-command messages
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_unknown_message))
+    
+    # Handle file uploads (photos, documents, audio, video, etc.)
+    app.add_handler(MessageHandler(
+        filters.PHOTO | filters.Document.ALL | filters.AUDIO | filters.VIDEO | filters.VOICE | filters.Sticker.ALL,
+        handle_file_upload
+    ))
     
     # Start the bot
     logger.info("Starting bot...")
