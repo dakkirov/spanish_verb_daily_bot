@@ -10,7 +10,8 @@ VERBS = [
             "portuguese": "conseguir / obter",
             "french": "obtenir / réussir",
             "italian": "ottenere / riuscire",
-            "german": "bekommen / erreichen"
+            "german": "bekommen / erreichen",
+            "russian": "получить / добиться"
         },
         "presente": {
             "yo": "consigo",
@@ -45,7 +46,8 @@ VERBS = [
             "portuguese": "aproveitar",
             "french": "profiter de",
             "italian": "approfittare",
-            "german": "ausnutzen / nutzen"
+            "german": "ausnutzen / nutzen",
+            "russian": "воспользоваться"
         },
         "presente": {
             "yo": "aprovecho",
@@ -80,7 +82,8 @@ VERBS = [
             "portuguese": "desenvolver-se",
             "french": "se débrouiller",
             "italian": "cavarsela",
-            "german": "sich zurechtfinden"
+            "german": "sich zurechtfinden",
+            "russian": "справляться / ориентироваться"
         },
         "presente": {
             "yo": "me desenvuelvo",
@@ -115,7 +118,8 @@ VERBS = [
             "portuguese": "perceber / dar-se conta",
             "french": "se rendre compte",
             "italian": "rendersi conto",
-            "german": "bemerken / erkennen"
+            "german": "bemerken / erkennen",
+            "russian": "осознать / понять"
         },
         "presente": {
             "yo": "me doy cuenta",
@@ -150,7 +154,8 @@ VERBS = [
             "portuguese": "arrepender-se",
             "french": "se repentir / regretter",
             "italian": "pentirsi",
-            "german": "bereuen"
+            "german": "bereuen",
+            "russian": "сожалеть / раскаиваться"
         },
         "presente": {
             "yo": "me arrepiento",
@@ -185,7 +190,8 @@ VERBS = [
             "portuguese": "surgir",
             "french": "surgir / apparaître",
             "italian": "sorgere / emergere",
-            "german": "auftauchen / entstehen"
+            "german": "auftauchen / entstehen",
+            "russian": "возникать / появляться"
         },
         "presente": {
             "yo": "surjo",
@@ -220,7 +226,8 @@ VERBS = [
             "portuguese": "conseguir / alcançar",
             "french": "réussir / parvenir",
             "italian": "riuscire / ottenere",
-            "german": "erreichen / schaffen"
+            "german": "erreichen / schaffen",
+            "russian": "достигать / добиваться"
         },
         "presente": {
             "yo": "logro",
@@ -255,7 +262,8 @@ VERBS = [
             "portuguese": "pertencer",
             "french": "appartenir",
             "italian": "appartenere",
-            "german": "gehören"
+            "german": "gehören",
+            "russian": "принадлежать"
         },
         "presente": {
             "yo": "pertenezco",
@@ -290,7 +298,8 @@ VERBS = [
             "portuguese": "sentir falta / estranhar",
             "french": "manquer / regretter",
             "italian": "sentire la mancanza",
-            "german": "vermissen"
+            "german": "vermissen",
+            "russian": "скучать (по кому-то)"
         },
         "presente": {
             "yo": "extraño",
@@ -325,7 +334,8 @@ VERBS = [
             "portuguese": "aguentar / suportar",
             "french": "supporter / endurer",
             "italian": "sopportare",
-            "german": "aushalten / ertragen"
+            "german": "aushalten / ertragen",
+            "russian": "терпеть / выдерживать"
         },
         "presente": {
             "yo": "aguanto",
@@ -360,7 +370,8 @@ VERBS = [
             "portuguese": "atravessar",
             "french": "traverser",
             "italian": "attraversare",
-            "german": "durchqueren / durchmachen"
+            "german": "durchqueren / durchmachen",
+            "russian": "пересекать / переживать"
         },
         "presente": {
             "yo": "atravieso",
@@ -395,7 +406,8 @@ VERBS = [
             "portuguese": "investir / inverter",
             "french": "investir / inverser",
             "italian": "investire / invertire",
-            "german": "investieren / umkehren"
+            "german": "investieren / umkehren",
+            "russian": "инвестировать / переворачивать"
         },
         "presente": {
             "yo": "invierto",
@@ -430,7 +442,8 @@ VERBS = [
             "portuguese": "tropeçar",
             "french": "trébucher",
             "italian": "inciampare",
-            "german": "stolpern"
+            "german": "stolpern",
+            "russian": "споткнуться"
         },
         "presente": {
             "yo": "tropiezo",
@@ -465,7 +478,8 @@ VERBS = [
             "portuguese": "mentir",
             "french": "mentir",
             "italian": "mentire",
-            "german": "lügen"
+            "german": "lügen",
+            "russian": "лгать"
         },
         "presente": {
             "yo": "miento",
@@ -500,7 +514,8 @@ VERBS = [
             "portuguese": "agradecer",
             "french": "remercier",
             "italian": "ringraziare",
-            "german": "danken"
+            "german": "danken",
+            "russian": "благодарить"
         },
         "presente": {
             "yo": "agradezco",
@@ -535,7 +550,8 @@ VERBS = [
             "portuguese": "escolher / eleger",
             "french": "choisir / élire",
             "italian": "scegliere / eleggere",
-            "german": "wählen / auswählen"
+            "german": "wählen / auswählen",
+            "russian": "выбирать"
         },
         "presente": {
             "yo": "elijo",
@@ -570,7 +586,8 @@ VERBS = [
             "portuguese": "fugir",
             "french": "fuir",
             "italian": "fuggire",
-            "german": "fliehen"
+            "german": "fliehen",
+            "russian": "убегать / спасаться"
         },
         "presente": {
             "yo": "huyo",
@@ -605,7 +622,8 @@ VERBS = [
             "portuguese": "carecer / faltar",
             "french": "manquer de",
             "italian": "mancare di",
-            "german": "fehlen / mangeln"
+            "german": "fehlen / mangeln",
+            "russian": "не иметь / испытывать недостаток"
         },
         "presente": {
             "yo": "carezco",
@@ -640,7 +658,8 @@ VERBS = [
             "portuguese": "despedir-se / demitir",
             "french": "dire au revoir / licencier",
             "italian": "salutare / licenziare",
-            "german": "verabschieden / entlassen"
+            "german": "verabschieden / entlassen",
+            "russian": "прощаться / увольнять"
         },
         "presente": {
             "yo": "despido",
@@ -675,7 +694,8 @@ VERBS = [
             "portuguese": "propor",
             "french": "proposer",
             "italian": "proporre",
-            "german": "vorschlagen"
+            "german": "vorschlagen",
+            "russian": "предлагать"
         },
         "presente": {
             "yo": "propongo",
@@ -710,7 +730,8 @@ VERBS = [
             "portuguese": "fracassar",
             "french": "échouer",
             "italian": "fallire",
-            "german": "scheitern"
+            "german": "scheitern",
+            "russian": "потерпеть неудачу"
         },
         "presente": {
             "yo": "fracaso",
@@ -745,7 +766,8 @@ VERBS = [
             "portuguese": "advertir / notar",
             "french": "avertir / remarquer",
             "italian": "avvertire",
-            "german": "warnen / bemerken"
+            "german": "warnen / bemerken",
+            "russian": "предупреждать / замечать"
         },
         "presente": {
             "yo": "advierto",
@@ -780,7 +802,8 @@ VERBS = [
             "portuguese": "esforçar-se",
             "french": "s'efforcer",
             "italian": "sforzarsi",
-            "german": "sich anstrengen"
+            "german": "sich anstrengen",
+            "russian": "стараться / прилагать усилия"
         },
         "presente": {
             "yo": "me esfuerzo",
@@ -815,7 +838,8 @@ VERBS = [
             "portuguese": "superar",
             "french": "surmonter / dépasser",
             "italian": "superare",
-            "german": "überwinden / übertreffen"
+            "german": "überwinden / übertreffen",
+            "russian": "преодолевать / превосходить"
         },
         "presente": {
             "yo": "supero",
@@ -850,7 +874,8 @@ VERBS = [
             "portuguese": "render / render-se",
             "french": "rendre / se rendre",
             "italian": "rendere / arrendersi",
-            "german": "leisten / sich ergeben"
+            "german": "leisten / sich ergeben",
+            "russian": "приносить результат / сдаваться"
         },
         "presente": {
             "yo": "rindo",
@@ -885,7 +910,8 @@ VERBS = [
             "portuguese": "negar",
             "french": "nier / refuser",
             "italian": "negare",
-            "german": "leugnen / verweigern"
+            "german": "leugnen / verweigern",
+            "russian": "отрицать / отказывать"
         },
         "presente": {
             "yo": "niego",
@@ -920,7 +946,8 @@ VERBS = [
             "portuguese": "fingir",
             "french": "feindre / faire semblant",
             "italian": "fingere",
-            "german": "vortäuschen / so tun als ob"
+            "german": "vortäuschen / so tun als ob",
+            "russian": "притворяться"
         },
         "presente": {
             "yo": "finjo",
@@ -955,7 +982,8 @@ VERBS = [
             "portuguese": "apostar",
             "french": "parier",
             "italian": "scommettere",
-            "german": "wetten"
+            "german": "wetten",
+            "russian": "ставить (делать ставку)"
         },
         "presente": {
             "yo": "apuesto",
@@ -990,7 +1018,8 @@ VERBS = [
             "portuguese": "envelhecer",
             "french": "vieillir",
             "italian": "invecchiare",
-            "german": "altern"
+            "german": "altern",
+            "russian": "стареть"
         },
         "presente": {
             "yo": "envejezco",
@@ -1025,7 +1054,8 @@ VERBS = [
             "portuguese": "enganar-se / equivocar-se",
             "french": "se tromper",
             "italian": "sbagliarsi",
-            "german": "sich irren"
+            "german": "sich irren",
+            "russian": "ошибаться"
         },
         "presente": {
             "yo": "me equivoco",
