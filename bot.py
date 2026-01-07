@@ -127,32 +127,46 @@ def get_verb_expand_buttons(verb_index: int, difficulty: str, lang: str, shown_t
     if shown_tenses is None:
         shown_tenses = []
     
-    buttons = []
+    tense_buttons = []
     
     # Determine which buttons to show based on difficulty and what's already shown
     if difficulty == 'beginner':
         # Show all three buttons
         if 'presente' not in shown_tenses:
-            buttons.append(InlineKeyboardButton(get_text("btn_show_present", lang), callback_data=f"verb_{verb_index}_presente"))
+            tense_buttons.append(InlineKeyboardButton(get_text("btn_show_present", lang), callback_data=f"verb_{verb_index}_presente"))
         if 'pasado' not in shown_tenses:
-            buttons.append(InlineKeyboardButton(get_text("btn_show_past", lang), callback_data=f"verb_{verb_index}_pasado"))
+            tense_buttons.append(InlineKeyboardButton(get_text("btn_show_past", lang), callback_data=f"verb_{verb_index}_pasado"))
         if 'futuro' not in shown_tenses:
-            buttons.append(InlineKeyboardButton(get_text("btn_show_future", lang), callback_data=f"verb_{verb_index}_futuro"))
+            tense_buttons.append(InlineKeyboardButton(get_text("btn_show_future", lang), callback_data=f"verb_{verb_index}_futuro"))
     
     elif difficulty == 'intermediate':
         # Present already shown, offer past and future
         if 'pasado' not in shown_tenses:
-            buttons.append(InlineKeyboardButton(get_text("btn_show_past", lang), callback_data=f"verb_{verb_index}_pasado"))
+            tense_buttons.append(InlineKeyboardButton(get_text("btn_show_past", lang), callback_data=f"verb_{verb_index}_pasado"))
         if 'futuro' not in shown_tenses:
-            buttons.append(InlineKeyboardButton(get_text("btn_show_future", lang), callback_data=f"verb_{verb_index}_futuro"))
+            tense_buttons.append(InlineKeyboardButton(get_text("btn_show_future", lang), callback_data=f"verb_{verb_index}_futuro"))
     
-    # Advanced shows everything, no buttons needed
+    # Build keyboard
+    keyboard = []
     
-    if buttons:
-        # Arrange in rows of 3
-        keyboard = [buttons[i:i+3] for i in range(0, len(buttons), 3)]
-        return InlineKeyboardMarkup(keyboard)
-    return None
+    # Add tense buttons in a row (if any)
+    if tense_buttons:
+        keyboard.append(tense_buttons)
+    
+    # Always add "Another word" button at the bottom
+    keyboard.append([InlineKeyboardButton(get_text("btn_another_word", lang), callback_data="action_newverb")])
+    
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_quiz_result_buttons(lang: str) -> InlineKeyboardMarkup:
+    """Get buttons to show after quiz results."""
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(get_text("btn_quiz", lang), callback_data="action_quiz"),
+            InlineKeyboardButton(get_text("btn_new_verb", lang), callback_data="action_newverb")
+        ]
+    ])
 
 
 def get_difficulty_keyboard(lang: str):
@@ -364,13 +378,10 @@ async def send_verb_to_user(bot, user_id: int):
     # Format message based on difficulty
     message = format_verb_message(verb, lang, difficulty)
     
-    # Get expand buttons if not advanced
+    # Get expand buttons (always includes "Another word" now)
     buttons = get_verb_expand_buttons(verb_index, difficulty, lang)
     
-    if buttons:
-        await bot.send_message(user_id, message, parse_mode='HTML', reply_markup=buttons)
-    else:
-        await bot.send_message(user_id, message, parse_mode='HTML')
+    await bot.send_message(user_id, message, parse_mode='HTML', reply_markup=buttons)
 
 
 async def handle_verb_expand_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -532,10 +543,14 @@ async def handle_quiz_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # Record result
     db.record_quiz_result(user_id, verb_index, question_type, is_correct)
     
+    # Get buttons for next action
+    buttons = get_quiz_result_buttons(lang)
+    
     if is_correct:
         await query.edit_message_text(
             get_text("quiz_correct", lang),
-            parse_mode='HTML'
+            parse_mode='HTML',
+            reply_markup=buttons
         )
     else:
         verb = get_verb_by_index(verb_index)
@@ -544,8 +559,108 @@ async def handle_quiz_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         
         await query.edit_message_text(
             get_text("quiz_incorrect", lang, verb=verb['infinitive'], translation=translation),
-            parse_mode='HTML'
+            parse_mode='HTML',
+            reply_markup=buttons
         )
+
+
+async def handle_action_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle action buttons (new verb, quiz)."""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = query.from_user.id
+    user = db.get_user(user_id)
+    
+    if not user or not user['onboarding_complete']:
+        return
+    
+    if query.data == "action_newverb":
+        # Send a new verb
+        await send_verb_to_user(context.bot, user_id)
+    
+    elif query.data == "action_quiz":
+        # Start a new quiz - reuse quiz logic
+        lang = user['language']
+        recent_indices = db.get_recent_verbs(user_id, limit=10)
+        
+        if len(recent_indices) < 1:
+            await context.bot.send_message(user_id, get_text("quiz_need_verbs", lang))
+            return
+        
+        # Pick a verb to quiz on
+        quiz_verb_index = random.choice(recent_indices)
+        quiz_verb = get_verb_by_index(quiz_verb_index)
+        
+        # Generate quiz question
+        question_type = random.choice(['meaning', 'conjugation'])
+        
+        if question_type == 'meaning':
+            correct_answer = quiz_verb['translations'][user['language']]
+            other_indices = [i for i in range(get_verb_count()) if i != quiz_verb_index]
+            wrong_indices = random.sample(other_indices, 3)
+            wrong_answers = [get_verb_by_index(i)['translations'][user['language']] for i in wrong_indices]
+            
+            all_answers = [correct_answer] + wrong_answers
+            random.shuffle(all_answers)
+            
+            keyboard = []
+            for i, answer in enumerate(all_answers):
+                letter = chr(65 + i)
+                is_correct = 1 if answer == correct_answer else 0
+                keyboard.append([InlineKeyboardButton(
+                    f"{letter}) {answer}", 
+                    callback_data=f"quiz_{quiz_verb_index}_meaning_{is_correct}"
+                )])
+            
+            await context.bot.send_message(
+                user_id,
+                get_text("quiz_title", lang) + 
+                get_text("quiz_meaning_question", lang, verb=quiz_verb['infinitive']),
+                parse_mode='HTML',
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        
+        else:
+            tense = random.choice(['presente', 'pasado', 'futuro'])
+            pronoun = random.choice(['yo', 'vos', 'él/ella'])
+            correct_answer = quiz_verb[tense][pronoun]
+            
+            all_tenses = ['presente', 'pasado', 'futuro']
+            all_pronouns = ['yo', 'vos', 'él/ella', 'nosotros', 'ustedes']
+            
+            other_conjugations = []
+            for t in all_tenses:
+                for p in all_pronouns:
+                    conj = quiz_verb[t][p]
+                    if conj != correct_answer and conj not in other_conjugations:
+                        other_conjugations.append(conj)
+            
+            wrong_answers = random.sample(other_conjugations, min(3, len(other_conjugations)))
+            
+            all_answers = [correct_answer] + wrong_answers
+            random.shuffle(all_answers)
+            
+            tense_key = f"tense_{tense.replace('presente', 'present').replace('pasado', 'past').replace('futuro', 'future')}"
+            tense_name = get_text(tense_key, lang)
+            
+            keyboard = []
+            for i, answer in enumerate(all_answers):
+                letter = chr(65 + i)
+                is_correct = 1 if answer == correct_answer else 0
+                keyboard.append([InlineKeyboardButton(
+                    f"{letter}) {answer}",
+                    callback_data=f"quiz_{quiz_verb_index}_conjugation_{is_correct}"
+                )])
+            
+            await context.bot.send_message(
+                user_id,
+                get_text("quiz_title", lang) +
+                f"<b>{quiz_verb['infinitive'].upper()}</b>\n\n" +
+                get_text("quiz_conjugation_question", lang, tense=tense_name, pronoun=pronoun),
+                parse_mode='HTML',
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
 
 
 async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -794,6 +909,7 @@ def main():
     # Callback handlers
     app.add_handler(CallbackQueryHandler(handle_quiz_callback, pattern=r"^quiz_"))
     app.add_handler(CallbackQueryHandler(handle_verb_expand_callback, pattern=r"^verb_"))
+    app.add_handler(CallbackQueryHandler(handle_action_callback, pattern=r"^action_"))
     app.add_handler(CallbackQueryHandler(handle_settings_callback, pattern=r"^(settings_|setlang_|settime_|settz_|setdiff_)"))
     app.add_handler(CallbackQueryHandler(handle_onboarding_callback, pattern=r"^(lang_|tz_|time_|diff_)"))
     
