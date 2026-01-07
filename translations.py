@@ -12,14 +12,14 @@ TRANSLATIONS = {
         "russian": "Добро пожаловать! 🇦🇷 Я буду отправлять тебе аргентинский испанский глагол каждый день.\n\nДавай настроим всё!\n\n<b>На какой язык переводить глаголы?</b>"
     },
     "language_selected": {
-        "english": "Great! I'll translate verbs to {lang}.\n\n<b>What's your timezone?</b>",
-        "portuguese": "Ótimo! Vou traduzir os verbos para {lang}.\n\n<b>Qual é o seu fuso horário?</b>",
-        "french": "Super ! Je traduirai les verbes en {lang}.\n\n<b>Quel est ton fuseau horaire ?</b>",
-        "italian": "Ottimo! Tradurrò i verbi in {lang}.\n\n<b>Qual è il tuo fuso orario?</b>",
-        "german": "Super! Ich werde die Verben auf {lang} übersetzen.\n\n<b>Was ist deine Zeitzone?</b>",
-        "russian": "Отлично! Буду переводить глаголы на {lang}.\n\n<b>Какой у тебя часовой пояс?</b>"
+        "english": "Great! I'll translate verbs to {language_name}.\n\n<b>What's your timezone?</b>",
+        "portuguese": "Ótimo! Vou traduzir os verbos para {language_name}.\n\n<b>Qual é o seu fuso horário?</b>",
+        "french": "Super ! Je traduirai les verbes en {language_name}.\n\n<b>Quel est ton fuseau horaire ?</b>",
+        "italian": "Ottimo! Tradurrò i verbi in {language_name}.\n\n<b>Qual è il tuo fuso orario?</b>",
+        "german": "Super! Ich werde die Verben auf {language_name} übersetzen.\n\n<b>Was ist deine Zeitzone?</b>",
+        "russian": "Отлично! Буду переводить глаголы на {language_name}.\n\n<b>Какой у тебя часовой пояс?</b>"
     },
-    "select_time": {
+    "onboarding_select_time": {
         "english": "<b>What time should I send your daily verb?</b>\n\n(Time in your selected timezone)",
         "portuguese": "<b>A que horas devo enviar seu verbo diário?</b>\n\n(Horário no seu fuso horário selecionado)",
         "french": "<b>À quelle heure dois-je t'envoyer ton verbe quotidien ?</b>\n\n(Heure dans ton fuseau horaire)",
@@ -28,12 +28,12 @@ TRANSLATIONS = {
         "russian": "<b>В какое время отправлять ежедневный глагол?</b>\n\n(Время в выбранном часовом поясе)"
     },
     "setup_complete": {
-        "english": "✅ <b>You're all set!</b>\n\n📚 Translation: {lang}\n🕐 Daily verb at: {time}\n🌍 Timezone: {tz}\n\n<b>Commands:</b>\n/verb - Get a random verb now\n/quiz - Test yourself on recent verbs\n/stats - See your progress\n/settings - Change your preferences\n\nHere's your first verb! 👇",
-        "portuguese": "✅ <b>Tudo pronto!</b>\n\n📚 Tradução: {lang}\n🕐 Verbo diário às: {time}\n🌍 Fuso horário: {tz}\n\n<b>Comandos:</b>\n/verb - Receber um verbo aleatório\n/quiz - Testar seu conhecimento\n/stats - Ver seu progresso\n/settings - Alterar preferências\n\nAqui está seu primeiro verbo! 👇",
-        "french": "✅ <b>C'est prêt !</b>\n\n📚 Traduction : {lang}\n🕐 Verbe quotidien à : {time}\n🌍 Fuseau horaire : {tz}\n\n<b>Commandes :</b>\n/verb - Obtenir un verbe aléatoire\n/quiz - Tester tes connaissances\n/stats - Voir ta progression\n/settings - Modifier tes préférences\n\nVoici ton premier verbe ! 👇",
-        "italian": "✅ <b>Tutto pronto!</b>\n\n📚 Traduzione: {lang}\n🕐 Verbo quotidiano alle: {time}\n🌍 Fuso orario: {tz}\n\n<b>Comandi:</b>\n/verb - Ricevi un verbo casuale\n/quiz - Metti alla prova le tue conoscenze\n/stats - Vedi i tuoi progressi\n/settings - Modifica le preferenze\n\nEcco il tuo primo verbo! 👇",
-        "german": "✅ <b>Alles eingerichtet!</b>\n\n📚 Übersetzung: {lang}\n🕐 Tägliches Verb um: {time}\n🌍 Zeitzone: {tz}\n\n<b>Befehle:</b>\n/verb - Zufälliges Verb erhalten\n/quiz - Teste dein Wissen\n/stats - Fortschritt anzeigen\n/settings - Einstellungen ändern\n\nHier ist dein erstes Verb! 👇",
-        "russian": "✅ <b>Всё готово!</b>\n\n📚 Перевод: {lang}\n🕐 Ежедневный глагол в: {time}\n🌍 Часовой пояс: {tz}\n\n<b>Команды:</b>\n/verb - Получить случайный глагол\n/quiz - Проверить знания\n/stats - Посмотреть прогресс\n/settings - Изменить настройки\n\nВот твой первый глагол! 👇"
+        "english": "✅ <b>You're all set!</b>\n\n📚 Translation: {language_name}\n🕐 Daily verb at: {time}\n🌍 Timezone: {tz}\n\n<b>Commands:</b>\n/verb - Get a random verb now\n/quiz - Test yourself on recent verbs\n/stats - See your progress\n/settings - Change your preferences\n\nHere's your first verb! 👇",
+        "portuguese": "✅ <b>Tudo pronto!</b>\n\n📚 Tradução: {language_name}\n🕐 Verbo diário às: {time}\n🌍 Fuso horário: {tz}\n\n<b>Comandos:</b>\n/verb - Receber um verbo aleatório\n/quiz - Testar seu conhecimento\n/stats - Ver seu progresso\n/settings - Alterar preferências\n\nAqui está seu primeiro verbo! 👇",
+        "french": "✅ <b>C'est prêt !</b>\n\n📚 Traduction : {language_name}\n🕐 Verbe quotidien à : {time}\n🌍 Fuseau horaire : {tz}\n\n<b>Commandes :</b>\n/verb - Obtenir un verbe aléatoire\n/quiz - Tester tes connaissances\n/stats - Voir ta progression\n/settings - Modifier tes préférences\n\nVoici ton premier verbe ! 👇",
+        "italian": "✅ <b>Tutto pronto!</b>\n\n📚 Traduzione: {language_name}\n🕐 Verbo quotidiano alle: {time}\n🌍 Fuso orario: {tz}\n\n<b>Comandi:</b>\n/verb - Ricevi un verbo casuale\n/quiz - Metti alla prova le tue conoscenze\n/stats - Vedi i tuoi progressi\n/settings - Modifica le preferenze\n\nEcco il tuo primo verbo! 👇",
+        "german": "✅ <b>Alles eingerichtet!</b>\n\n📚 Übersetzung: {language_name}\n🕐 Tägliches Verb um: {time}\n🌍 Zeitzone: {tz}\n\n<b>Befehle:</b>\n/verb - Zufälliges Verb erhalten\n/quiz - Teste dein Wissen\n/stats - Fortschritt anzeigen\n/settings - Einstellungen ändern\n\nHier ist dein erstes Verb! 👇",
+        "russian": "✅ <b>Всё готово!</b>\n\n📚 Перевод: {language_name}\n🕐 Ежедневный глагол в: {time}\n🌍 Часовой пояс: {tz}\n\n<b>Команды:</b>\n/verb - Получить случайный глагол\n/quiz - Проверить знания\n/stats - Посмотреть прогресс\n/settings - Изменить настройки\n\nВот твой первый глагол! 👇"
     },
     "welcome_back": {
         "english": "Welcome back! 🎉\n\nUse /verb to get a random verb\nUse /quiz to test yourself\nUse /settings to change your preferences\nUse /stats to see your progress",
@@ -148,12 +148,12 @@ TRANSLATIONS = {
     
     # === SETTINGS ===
     "settings_title": {
-        "english": "⚙️ <b>Current Settings</b>\n\n🌐 Language: {lang}\n🕐 Daily time: {time}\n🌍 Timezone: {tz}\n📬 Status: {status}\n\nWhat would you like to change?",
-        "portuguese": "⚙️ <b>Configurações Atuais</b>\n\n🌐 Idioma: {lang}\n🕐 Horário diário: {time}\n🌍 Fuso horário: {tz}\n📬 Status: {status}\n\nO que você gostaria de alterar?",
-        "french": "⚙️ <b>Paramètres Actuels</b>\n\n🌐 Langue : {lang}\n🕐 Heure quotidienne : {time}\n🌍 Fuseau horaire : {tz}\n📬 Statut : {status}\n\nQue voulez-vous modifier ?",
-        "italian": "⚙️ <b>Impostazioni Attuali</b>\n\n🌐 Lingua: {lang}\n🕐 Orario giornaliero: {time}\n🌍 Fuso orario: {tz}\n📬 Stato: {status}\n\nCosa vuoi modificare?",
-        "german": "⚙️ <b>Aktuelle Einstellungen</b>\n\n🌐 Sprache: {lang}\n🕐 Tägliche Zeit: {time}\n🌍 Zeitzone: {tz}\n📬 Status: {status}\n\nWas möchtest du ändern?",
-        "russian": "⚙️ <b>Текущие настройки</b>\n\n🌐 Язык: {lang}\n🕐 Время отправки: {time}\n🌍 Часовой пояс: {tz}\n📬 Статус: {status}\n\nЧто хотите изменить?"
+        "english": "⚙️ <b>Current Settings</b>\n\n🌐 Language: {language_name}\n🕐 Daily time: {time}\n🌍 Timezone: {tz}\n📬 Status: {status}\n\nWhat would you like to change?",
+        "portuguese": "⚙️ <b>Configurações Atuais</b>\n\n🌐 Idioma: {language_name}\n🕐 Horário diário: {time}\n🌍 Fuso horário: {tz}\n📬 Status: {status}\n\nO que você gostaria de alterar?",
+        "french": "⚙️ <b>Paramètres Actuels</b>\n\n🌐 Langue : {language_name}\n🕐 Heure quotidienne : {time}\n🌍 Fuseau horaire : {tz}\n📬 Statut : {status}\n\nQue voulez-vous modifier ?",
+        "italian": "⚙️ <b>Impostazioni Attuali</b>\n\n🌐 Lingua: {language_name}\n🕐 Orario giornaliero: {time}\n🌍 Fuso orario: {tz}\n📬 Stato: {status}\n\nCosa vuoi modificare?",
+        "german": "⚙️ <b>Aktuelle Einstellungen</b>\n\n🌐 Sprache: {language_name}\n🕐 Tägliche Zeit: {time}\n🌍 Zeitzone: {tz}\n📬 Status: {status}\n\nWas möchtest du ändern?",
+        "russian": "⚙️ <b>Текущие настройки</b>\n\n🌐 Язык: {language_name}\n🕐 Время отправки: {time}\n🌍 Часовой пояс: {tz}\n📬 Статус: {status}\n\nЧто хотите изменить?"
     },
     "status_active": {
         "english": "Active",
@@ -236,12 +236,12 @@ TRANSLATIONS = {
         "russian": "Выберите часовой пояс:"
     },
     "language_changed": {
-        "english": "✅ Language changed to {lang}!\n\nUse /settings to make more changes.",
-        "portuguese": "✅ Idioma alterado para {lang}!\n\nUse /settings para mais alterações.",
-        "french": "✅ Langue changée en {lang} !\n\nUtilisez /settings pour d'autres modifications.",
-        "italian": "✅ Lingua cambiata in {lang}!\n\nUsa /settings per altre modifiche.",
-        "german": "✅ Sprache auf {lang} geändert!\n\nBenutze /settings für weitere Änderungen.",
-        "russian": "✅ Язык изменён на {lang}!\n\nИспользуйте /settings для других изменений."
+        "english": "✅ Language changed to {language_name}!\n\nUse /settings to make more changes.",
+        "portuguese": "✅ Idioma alterado para {language_name}!\n\nUse /settings para mais alterações.",
+        "french": "✅ Langue changée en {language_name} !\n\nUtilisez /settings pour d'autres modifications.",
+        "italian": "✅ Lingua cambiata in {language_name}!\n\nUsa /settings per altre modifiche.",
+        "german": "✅ Sprache auf {language_name} geändert!\n\nBenutze /settings für weitere Änderungen.",
+        "russian": "✅ Язык изменён на {language_name}!\n\nИспользуйте /settings для других изменений."
     },
     "time_changed": {
         "english": "✅ Daily time changed to {time}!\n\nUse /settings to make more changes.",
