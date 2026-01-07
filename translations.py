@@ -83,6 +83,30 @@ TRANSLATIONS = {
         "german": "⏩ Futur",
         "russian": "⏩ Будущее"
     },
+    "btn_another_word": {
+        "english": "📚 Another Word",
+        "portuguese": "📚 Outra Palavra",
+        "french": "📚 Autre Mot",
+        "italian": "📚 Altra Parola",
+        "german": "📚 Neues Wort",
+        "russian": "📚 Ещё слово"
+    },
+    "btn_quiz": {
+        "english": "🧠 Quiz",
+        "portuguese": "🧠 Quiz",
+        "french": "🧠 Quiz",
+        "italian": "🧠 Quiz",
+        "german": "🧠 Quiz",
+        "russian": "🧠 Тест"
+    },
+    "btn_new_verb": {
+        "english": "📚 New Verb",
+        "portuguese": "📚 Novo Verbo",
+        "french": "📚 Nouveau Verbe",
+        "italian": "📚 Nuovo Verbo",
+        "german": "📚 Neues Verb",
+        "russian": "📚 Новый глагол"
+    },
     "btn_change_difficulty": {
         "english": "📊 Change Level",
         "portuguese": "📊 Alterar Nível",
@@ -176,20 +200,20 @@ TRANSLATIONS = {
         "russian": "Какая форма <b>{tense}</b> для <b>{pronoun}</b>?"
     },
     "quiz_correct": {
-        "english": "✅ <b>Correct!</b> Great job! 🎉\n\nUse /quiz for another question or /verb for a new verb.",
-        "portuguese": "✅ <b>Correto!</b> Muito bem! 🎉\n\nUse /quiz para outra pergunta ou /verb para um novo verbo.",
-        "french": "✅ <b>Correct !</b> Bravo ! 🎉\n\nUtilise /quiz pour une autre question ou /verb pour un nouveau verbe.",
-        "italian": "✅ <b>Corretto!</b> Ottimo lavoro! 🎉\n\nUsa /quiz per un'altra domanda o /verb per un nuovo verbo.",
-        "german": "✅ <b>Richtig!</b> Gut gemacht! 🎉\n\nBenutze /quiz für eine weitere Frage oder /verb für ein neues Verb.",
-        "russian": "✅ <b>Правильно!</b> Отличная работа! 🎉\n\nИспользуй /quiz для следующего вопроса или /verb для нового глагола."
+        "english": "✅ <b>Correct!</b> Great job! 🎉",
+        "portuguese": "✅ <b>Correto!</b> Muito bem! 🎉",
+        "french": "✅ <b>Correct !</b> Bravo ! 🎉",
+        "italian": "✅ <b>Corretto!</b> Ottimo lavoro! 🎉",
+        "german": "✅ <b>Richtig!</b> Gut gemacht! 🎉",
+        "russian": "✅ <b>Правильно!</b> Отличная работа! 🎉"
     },
     "quiz_incorrect": {
-        "english": "❌ <b>Not quite!</b>\n\n<b>{verb}</b> = {translation}\n\nKeep practicing! Use /quiz for another question.",
-        "portuguese": "❌ <b>Não foi dessa vez!</b>\n\n<b>{verb}</b> = {translation}\n\nContinue praticando! Use /quiz para outra pergunta.",
-        "french": "❌ <b>Pas tout à fait !</b>\n\n<b>{verb}</b> = {translation}\n\nContinue à pratiquer ! Utilise /quiz pour une autre question.",
-        "italian": "❌ <b>Non proprio!</b>\n\n<b>{verb}</b> = {translation}\n\nContinua a praticare! Usa /quiz per un'altra domanda.",
-        "german": "❌ <b>Nicht ganz!</b>\n\n<b>{verb}</b> = {translation}\n\nWeiter üben! Benutze /quiz für eine weitere Frage.",
-        "russian": "❌ <b>Не совсем!</b>\n\n<b>{verb}</b> = {translation}\n\nПродолжай практиковаться! Используй /quiz для следующего вопроса."
+        "english": "❌ <b>Not quite!</b>\n\n<b>{verb}</b> = {translation}",
+        "portuguese": "❌ <b>Não foi dessa vez!</b>\n\n<b>{verb}</b> = {translation}",
+        "french": "❌ <b>Pas tout à fait !</b>\n\n<b>{verb}</b> = {translation}",
+        "italian": "❌ <b>Non proprio!</b>\n\n<b>{verb}</b> = {translation}",
+        "german": "❌ <b>Nicht ganz!</b>\n\n<b>{verb}</b> = {translation}",
+        "russian": "❌ <b>Не совсем!</b>\n\n<b>{verb}</b> = {translation}"
     },
     "tense_present": {
         "english": "Present",
