@@ -33,11 +33,11 @@ logger = logging.getLogger(__name__)
 # Supported languages for translation
 LANGUAGES = {
     'english': '🇬🇧 English',
-    'portuguese': '🇧🇷 Português', 
-    'french': '🇫🇷 Français',
-    'italian': '🇮🇹 Italiano',
-    'german': '🇩🇪 Deutsch',
-    'russian': '🇷🇺 Русский'
+    'portuguese': '🇧🇷 Portuguese', 
+    'french': '🇫🇷 French',
+    'italian': '🇮🇹 Italian',
+    'german': '🇩🇪 German',
+    'russian': '🇷🇺 Russian'
 }
 
 # Common timezones
@@ -184,53 +184,63 @@ async def handle_onboarding_callback(update: Update, context: ContextTypes.DEFAU
     user = db.get_user(user_id)
     
     if not user:
+        logger.error(f"User {user_id} not found in database during onboarding callback")
         return
     
-    if data.startswith('lang_'):
-        # Language selected
-        language = data.replace('lang_', '')
-        db.update_user(user_id, language=language, onboarding_step='timezone')
+    try:
+        if data.startswith('lang_'):
+            # Language selected
+            language = data.replace('lang_', '')
+            db.update_user(user_id, language=language, onboarding_step='timezone')
+            
+            # Now use the selected language for all messages
+            await query.edit_message_text(
+                get_text("language_selected", language, language_name=LANGUAGES[language]),
+                parse_mode='HTML',
+                reply_markup=get_timezone_keyboard()
+            )
         
-        # Now use the selected language for all messages
-        await query.edit_message_text(
-            get_text("language_selected", language, lang=LANGUAGES[language]),
-            parse_mode='HTML',
-            reply_markup=get_timezone_keyboard()
-        )
+        elif data.startswith('tz_'):
+            # Timezone selected
+            timezone = data.replace('tz_', '')
+            db.update_user(user_id, timezone=timezone, onboarding_step='time')
+            
+            # Re-fetch user to get updated language
+            user = db.get_user(user_id)
+            lang = user['language']
+            await query.edit_message_text(
+                get_text("onboarding_select_time", lang),
+                parse_mode='HTML',
+                reply_markup=get_time_keyboard()
+            )
+        
+        elif data.startswith('time_'):
+            # Time selected - onboarding complete!
+            daily_time = data.replace('time_', '')
+            db.update_user(user_id, daily_time=daily_time, onboarding_complete=1, onboarding_step='done')
+            
+            user = db.get_user(user_id)
+            lang = user['language']
+            
+            # Schedule the daily job for this user
+            schedule_user_daily_verb(context.application, user)
+            
+            await query.edit_message_text(
+                get_text("setup_complete", lang, 
+                         language_name=LANGUAGES[user['language']], 
+                         time=daily_time, 
+                         tz=user['timezone']),
+                parse_mode='HTML'
+            )
+            
+            # Send first verb
+            await send_verb_to_user(context.application.bot, user_id)
     
-    elif data.startswith('tz_'):
-        # Timezone selected
-        timezone = data.replace('tz_', '')
-        db.update_user(user_id, timezone=timezone, onboarding_step='time')
-        
-        lang = user['language']
+    except Exception as e:
+        logger.error(f"Error in onboarding callback for user {user_id}: {e}")
         await query.edit_message_text(
-            get_text("select_time", lang),
-            parse_mode='HTML',
-            reply_markup=get_time_keyboard()
+            f"An error occurred. Please try /start again.\n\nError: {str(e)}"
         )
-    
-    elif data.startswith('time_'):
-        # Time selected - onboarding complete!
-        daily_time = data.replace('time_', '')
-        db.update_user(user_id, daily_time=daily_time, onboarding_complete=1, onboarding_step='done')
-        
-        user = db.get_user(user_id)
-        lang = user['language']
-        
-        # Schedule the daily job for this user
-        schedule_user_daily_verb(context.application, user)
-        
-        await query.edit_message_text(
-            get_text("setup_complete", lang, 
-                     lang=LANGUAGES[user['language']], 
-                     time=daily_time, 
-                     tz=user['timezone']),
-            parse_mode='HTML'
-        )
-        
-        # Send first verb
-        await send_verb_to_user(context.application.bot, user_id)
 
 
 async def verb_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -451,7 +461,7 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(
         get_text("settings_title", lang,
-                 lang=LANGUAGES[user['language']],
+                 language_name=LANGUAGES[user['language']],
                  time=user['daily_time'],
                  tz=user['timezone'],
                  status=status),
@@ -508,7 +518,7 @@ async def handle_settings_callback(update: Update, context: ContextTypes.DEFAULT
         db.update_user(user_id, language=language)
         # Use the NEW language for confirmation message
         await query.edit_message_text(
-            get_text("language_changed", language, lang=LANGUAGES[language])
+            get_text("language_changed", language, language_name=LANGUAGES[language])
         )
     
     elif data.startswith("settime_"):
