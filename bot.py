@@ -58,6 +58,13 @@ TIMEZONES = {
 # Time options
 TIME_OPTIONS = ['07:00', '08:00', '09:00', '10:00', '12:00', '18:00', '20:00', '21:00']
 
+# Difficulty levels
+DIFFICULTY_LEVELS = {
+    'beginner': '🌱',
+    'intermediate': '🌿', 
+    'advanced': '🌳'
+}
+
 
 def get_user_lang(user_id: int) -> str:
     """Get user's language preference, default to English."""
@@ -67,34 +74,94 @@ def get_user_lang(user_id: int) -> str:
     return 'english'
 
 
-def format_verb_message(verb: dict, language: str) -> str:
-    """Format a verb for display."""
+def format_verb_message(verb: dict, language: str, difficulty: str = 'beginner', show_tenses: list = None) -> str:
+    """Format a verb for display based on difficulty level."""
     translation = verb['translations'].get(language, verb['translations']['english'])
     
-    presente = verb['presente']
-    pasado = verb['pasado']
-    futuro = verb['futuro']
-    
+    # Base card - always shown
     message = f"""🇦🇷 <b>Verbo del Día</b>
 
 <b>{verb['infinitive'].upper()}</b>
 ({translation})
 
-📖 <i>{verb['definition']}</i>
+📖 <i>{verb['definition']}</i>"""
+    
+    # Determine which tenses to show based on difficulty or explicit show_tenses
+    if show_tenses is None:
+        show_tenses = []
+        if difficulty == 'intermediate':
+            show_tenses = ['presente']
+        elif difficulty == 'advanced':
+            show_tenses = ['presente', 'pasado', 'futuro']
+    
+    # Add tenses that should be shown
+    if 'presente' in show_tenses:
+        presente = verb['presente']
+        message += f"""
 
 🕐 <b>Presente:</b>
 yo {presente['yo']}, vos {presente['vos']}, él/ella {presente['él/ella']}
-nosotros {presente['nosotros']}, ustedes {presente['ustedes']}, ellos {presente['ellos/ellas']}
+nosotros {presente['nosotros']}, ustedes {presente['ustedes']}"""
+    
+    if 'pasado' in show_tenses:
+        pasado = verb['pasado']
+        message += f"""
 
 ⏪ <b>Pasado:</b>
 yo {pasado['yo']}, vos {pasado['vos']}, él/ella {pasado['él/ella']}
-nosotros {pasado['nosotros']}, ustedes {pasado['ustedes']}, ellos {pasado['ellos/ellas']}
+nosotros {pasado['nosotros']}, ustedes {pasado['ustedes']}"""
+    
+    if 'futuro' in show_tenses:
+        futuro = verb['futuro']
+        message += f"""
 
 ⏩ <b>Futuro:</b>
 yo {futuro['yo']}, vos {futuro['vos']}, él/ella {futuro['él/ella']}
-nosotros {futuro['nosotros']}, ustedes {futuro['ustedes']}, ellos {futuro['ellos/ellas']}"""
+nosotros {futuro['nosotros']}, ustedes {futuro['ustedes']}"""
     
     return message
+
+
+def get_verb_expand_buttons(verb_index: int, difficulty: str, lang: str, shown_tenses: list = None) -> InlineKeyboardMarkup:
+    """Get buttons to expand verb tenses based on difficulty."""
+    if shown_tenses is None:
+        shown_tenses = []
+    
+    buttons = []
+    
+    # Determine which buttons to show based on difficulty and what's already shown
+    if difficulty == 'beginner':
+        # Show all three buttons
+        if 'presente' not in shown_tenses:
+            buttons.append(InlineKeyboardButton(get_text("btn_show_present", lang), callback_data=f"verb_{verb_index}_presente"))
+        if 'pasado' not in shown_tenses:
+            buttons.append(InlineKeyboardButton(get_text("btn_show_past", lang), callback_data=f"verb_{verb_index}_pasado"))
+        if 'futuro' not in shown_tenses:
+            buttons.append(InlineKeyboardButton(get_text("btn_show_future", lang), callback_data=f"verb_{verb_index}_futuro"))
+    
+    elif difficulty == 'intermediate':
+        # Present already shown, offer past and future
+        if 'pasado' not in shown_tenses:
+            buttons.append(InlineKeyboardButton(get_text("btn_show_past", lang), callback_data=f"verb_{verb_index}_pasado"))
+        if 'futuro' not in shown_tenses:
+            buttons.append(InlineKeyboardButton(get_text("btn_show_future", lang), callback_data=f"verb_{verb_index}_futuro"))
+    
+    # Advanced shows everything, no buttons needed
+    
+    if buttons:
+        # Arrange in rows of 3
+        keyboard = [buttons[i:i+3] for i in range(0, len(buttons), 3)]
+        return InlineKeyboardMarkup(keyboard)
+    return None
+
+
+def get_difficulty_keyboard(lang: str):
+    """Get difficulty selection keyboard."""
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(get_text("difficulty_beginner", lang), callback_data="diff_beginner")],
+        [InlineKeyboardButton(get_text("difficulty_intermediate", lang), callback_data="diff_intermediate")],
+        [InlineKeyboardButton(get_text("difficulty_advanced", lang), callback_data="diff_advanced")]
+    ])
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -201,11 +268,24 @@ async def handle_onboarding_callback(update: Update, context: ContextTypes.DEFAU
             )
         
         elif data.startswith('tz_'):
-            # Timezone selected
+            # Timezone selected - now ask for difficulty
             timezone = data.replace('tz_', '')
-            db.update_user(user_id, timezone=timezone, onboarding_step='time')
+            db.update_user(user_id, timezone=timezone, onboarding_step='difficulty')
             
             # Re-fetch user to get updated language
+            user = db.get_user(user_id)
+            lang = user['language']
+            await query.edit_message_text(
+                get_text("select_difficulty", lang),
+                parse_mode='HTML',
+                reply_markup=get_difficulty_keyboard(lang)
+            )
+        
+        elif data.startswith('diff_'):
+            # Difficulty selected - now ask for time
+            difficulty = data.replace('diff_', '')
+            db.update_user(user_id, difficulty=difficulty, onboarding_step='time')
+            
             user = db.get_user(user_id)
             lang = user['language']
             await query.edit_message_text(
@@ -274,11 +354,67 @@ async def send_verb_to_user(bot, user_id: int):
     verb_index = random.choice(available_indices)
     verb = get_verb_by_index(verb_index)
     
-    # Record and send
+    # Record sent verb
     db.record_sent_verb(user_id, verb_index)
     
-    message = format_verb_message(verb, user['language'])
-    await bot.send_message(user_id, message, parse_mode='HTML')
+    # Get user's difficulty level
+    difficulty = user.get('difficulty', 'beginner')
+    lang = user['language']
+    
+    # Format message based on difficulty
+    message = format_verb_message(verb, lang, difficulty)
+    
+    # Get expand buttons if not advanced
+    buttons = get_verb_expand_buttons(verb_index, difficulty, lang)
+    
+    if buttons:
+        await bot.send_message(user_id, message, parse_mode='HTML', reply_markup=buttons)
+    else:
+        await bot.send_message(user_id, message, parse_mode='HTML')
+
+
+async def handle_verb_expand_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle verb tense expansion button presses."""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = query.from_user.id
+    user = db.get_user(user_id)
+    
+    if not user:
+        return
+    
+    # Parse callback data: verb_{index}_{tense}
+    parts = query.data.split('_')
+    verb_index = int(parts[1])
+    requested_tense = parts[2]  # presente, pasado, or futuro
+    
+    verb = get_verb_by_index(verb_index)
+    lang = user['language']
+    difficulty = user.get('difficulty', 'beginner')
+    
+    # Determine which tenses were already shown based on difficulty
+    if difficulty == 'beginner':
+        shown_tenses = []
+    elif difficulty == 'intermediate':
+        shown_tenses = ['presente']
+    else:
+        shown_tenses = ['presente', 'pasado', 'futuro']
+    
+    # Add the newly requested tense
+    if requested_tense not in shown_tenses:
+        shown_tenses.append(requested_tense)
+    
+    # Re-format the message with the new tense included
+    message = format_verb_message(verb, lang, difficulty, shown_tenses)
+    
+    # Get updated buttons (hiding the one just pressed)
+    buttons = get_verb_expand_buttons(verb_index, difficulty, lang, shown_tenses)
+    
+    if buttons:
+        await query.edit_message_text(message, parse_mode='HTML', reply_markup=buttons)
+    else:
+        await query.edit_message_text(message, parse_mode='HTML')
 
 
 async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -452,8 +588,13 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Get translated button labels
     pause_btn = get_text("btn_resume", lang) if not user['is_active'] else get_text("btn_pause", lang)
     
+    # Get difficulty display
+    difficulty = user.get('difficulty', 'beginner')
+    difficulty_display = f"{DIFFICULTY_LEVELS.get(difficulty, '🌱')} {difficulty.capitalize()}"
+    
     keyboard = [
         [InlineKeyboardButton(get_text("btn_change_language", lang), callback_data="settings_language")],
+        [InlineKeyboardButton(get_text("btn_change_difficulty", lang), callback_data="settings_difficulty")],
         [InlineKeyboardButton(get_text("btn_change_time", lang), callback_data="settings_time")],
         [InlineKeyboardButton(get_text("btn_change_timezone", lang), callback_data="settings_timezone")],
         [InlineKeyboardButton(pause_btn, callback_data="settings_pause")],
@@ -462,6 +603,7 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         get_text("settings_title", lang,
                  language_name=LANGUAGES[user['language']],
+                 difficulty=difficulty_display,
                  time=user['daily_time'],
                  tz=user['timezone'],
                  status=status),
@@ -542,6 +684,25 @@ async def handle_settings_callback(update: Update, context: ContextTypes.DEFAULT
         schedule_user_daily_verb(context.application, user)
         
         await query.edit_message_text(get_text("timezone_changed", lang))
+    
+    elif data == "settings_difficulty":
+        await query.edit_message_text(
+            get_text("select_difficulty", lang),
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton(get_text("difficulty_beginner", lang), callback_data="setdiff_beginner")],
+                [InlineKeyboardButton(get_text("difficulty_intermediate", lang), callback_data="setdiff_intermediate")],
+                [InlineKeyboardButton(get_text("difficulty_advanced", lang), callback_data="setdiff_advanced")]
+            ])
+        )
+    
+    elif data.startswith("setdiff_"):
+        difficulty = data.replace("setdiff_", "")
+        db.update_user(user_id, difficulty=difficulty)
+        difficulty_display = f"{DIFFICULTY_LEVELS.get(difficulty, '🌱')} {difficulty.capitalize()}"
+        await query.edit_message_text(
+            get_text("difficulty_changed", lang, level=difficulty_display)
+        )
 
 
 def get_time_keyboard_settings():
@@ -632,8 +793,9 @@ def main():
     
     # Callback handlers
     app.add_handler(CallbackQueryHandler(handle_quiz_callback, pattern=r"^quiz_"))
-    app.add_handler(CallbackQueryHandler(handle_settings_callback, pattern=r"^(settings_|setlang_|settime_|settz_)"))
-    app.add_handler(CallbackQueryHandler(handle_onboarding_callback, pattern=r"^(lang_|tz_|time_)"))
+    app.add_handler(CallbackQueryHandler(handle_verb_expand_callback, pattern=r"^verb_"))
+    app.add_handler(CallbackQueryHandler(handle_settings_callback, pattern=r"^(settings_|setlang_|settime_|settz_|setdiff_)"))
+    app.add_handler(CallbackQueryHandler(handle_onboarding_callback, pattern=r"^(lang_|tz_|time_|diff_)"))
     
     # Handle non-command messages
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_unknown_message))
