@@ -33,11 +33,11 @@ logger = logging.getLogger(__name__)
 # Supported languages for translation
 LANGUAGES = {
     'english': '🇬🇧 English',
-    'portuguese': '🇧🇷 Portuguese', 
-    'french': '🇫🇷 French',
-    'italian': '🇮🇹 Italian',
-    'german': '🇩🇪 German',
-    'russian': '🇷🇺 Russian'
+    'portuguese': '🇧🇷 Português', 
+    'french': '🇫🇷 Français',
+    'italian': '🇮🇹 Italiano',
+    'german': '🇩🇪 Deutsch',
+    'russian': '🇷🇺 Русский'
 }
 
 # Common timezones
