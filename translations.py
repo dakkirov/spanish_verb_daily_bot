@@ -27,6 +27,86 @@ TRANSLATIONS = {
         "german": "<b>Um welche Uhrzeit soll ich dir dein tägliches Verb senden?</b>\n\n(Zeit in deiner ausgewählten Zeitzone)",
         "russian": "<b>В какое время отправлять ежедневный глагол?</b>\n\n(Время в выбранном часовом поясе)"
     },
+    "select_difficulty": {
+        "english": "<b>What's your Spanish level?</b>\n\nThis controls how much info you see at once.",
+        "portuguese": "<b>Qual é o seu nível de espanhol?</b>\n\nIsso controla quanta informação você vê de uma vez.",
+        "french": "<b>Quel est ton niveau d'espagnol ?</b>\n\nCela contrôle la quantité d'infos affichées.",
+        "italian": "<b>Qual è il tuo livello di spagnolo?</b>\n\nQuesto controlla quante informazioni vedi.",
+        "german": "<b>Was ist dein Spanisch-Niveau?</b>\n\nDas bestimmt, wie viele Infos du siehst.",
+        "russian": "<b>Какой у тебя уровень испанского?</b>\n\nЭто определяет объём информации."
+    },
+    "difficulty_beginner": {
+        "english": "🌱 Beginner - Verb + meaning only",
+        "portuguese": "🌱 Iniciante - Apenas verbo + significado",
+        "french": "🌱 Débutant - Verbe + sens uniquement",
+        "italian": "🌱 Principiante - Solo verbo + significato",
+        "german": "🌱 Anfänger - Nur Verb + Bedeutung",
+        "russian": "🌱 Начинающий - Только глагол + значение"
+    },
+    "difficulty_intermediate": {
+        "english": "🌿 Intermediate - Plus present tense",
+        "portuguese": "🌿 Intermediário - Mais tempo presente",
+        "french": "🌿 Intermédiaire - Plus le présent",
+        "italian": "🌿 Intermedio - Più il presente",
+        "german": "🌿 Mittelstufe - Plus Präsens",
+        "russian": "🌿 Средний - Плюс настоящее время"
+    },
+    "difficulty_advanced": {
+        "english": "🌳 Advanced - All tenses shown",
+        "portuguese": "🌳 Avançado - Todos os tempos",
+        "french": "🌳 Avancé - Tous les temps",
+        "italian": "🌳 Avanzato - Tutti i tempi",
+        "german": "🌳 Fortgeschritten - Alle Zeiten",
+        "russian": "🌳 Продвинутый - Все времена"
+    },
+    "btn_show_present": {
+        "english": "🕐 Present",
+        "portuguese": "🕐 Presente",
+        "french": "🕐 Présent",
+        "italian": "🕐 Presente",
+        "german": "🕐 Präsens",
+        "russian": "🕐 Настоящее"
+    },
+    "btn_show_past": {
+        "english": "⏪ Past",
+        "portuguese": "⏪ Passado",
+        "french": "⏪ Passé",
+        "italian": "⏪ Passato",
+        "german": "⏪ Vergangenheit",
+        "russian": "⏪ Прошедшее"
+    },
+    "btn_show_future": {
+        "english": "⏩ Future",
+        "portuguese": "⏩ Futuro",
+        "french": "⏩ Futur",
+        "italian": "⏩ Futuro",
+        "german": "⏩ Futur",
+        "russian": "⏩ Будущее"
+    },
+    "btn_change_difficulty": {
+        "english": "📊 Change Level",
+        "portuguese": "📊 Alterar Nível",
+        "french": "📊 Changer le Niveau",
+        "italian": "📊 Cambia Livello",
+        "german": "📊 Stufe Ändern",
+        "russian": "📊 Изменить Уровень"
+    },
+    "difficulty_changed": {
+        "english": "✅ Level changed to {level}!\n\nUse /settings to make more changes.",
+        "portuguese": "✅ Nível alterado para {level}!\n\nUse /settings para mais alterações.",
+        "french": "✅ Niveau changé en {level} !\n\nUtilisez /settings pour d'autres modifications.",
+        "italian": "✅ Livello cambiato in {level}!\n\nUsa /settings per altre modifiche.",
+        "german": "✅ Stufe auf {level} geändert!\n\nBenutze /settings für weitere Änderungen.",
+        "russian": "✅ Уровень изменён на {level}!\n\nИспользуйте /settings для других изменений."
+    },
+    "conjugation_header": {
+        "english": "📖 <b>{tense}</b> - {verb}",
+        "portuguese": "📖 <b>{tense}</b> - {verb}",
+        "french": "📖 <b>{tense}</b> - {verb}",
+        "italian": "📖 <b>{tense}</b> - {verb}",
+        "german": "📖 <b>{tense}</b> - {verb}",
+        "russian": "📖 <b>{tense}</b> - {verb}"
+    },
     "setup_complete": {
         "english": "✅ <b>You're all set!</b>\n\n📚 Translation: {language_name}\n🕐 Daily verb at: {time}\n🌍 Timezone: {tz}\n\n<b>Commands:</b>\n/verb - Get a random verb now\n/quiz - Test yourself on recent verbs\n/stats - See your progress\n/settings - Change your preferences\n\nHere's your first verb! 👇",
         "portuguese": "✅ <b>Tudo pronto!</b>\n\n📚 Tradução: {language_name}\n🕐 Verbo diário às: {time}\n🌍 Fuso horário: {tz}\n\n<b>Comandos:</b>\n/verb - Receber um verbo aleatório\n/quiz - Testar seu conhecimento\n/stats - Ver seu progresso\n/settings - Alterar preferências\n\nAqui está seu primeiro verbo! 👇",
@@ -148,12 +228,12 @@ TRANSLATIONS = {
     
     # === SETTINGS ===
     "settings_title": {
-        "english": "⚙️ <b>Current Settings</b>\n\n🌐 Language: {language_name}\n🕐 Daily time: {time}\n🌍 Timezone: {tz}\n📬 Status: {status}\n\nWhat would you like to change?",
-        "portuguese": "⚙️ <b>Configurações Atuais</b>\n\n🌐 Idioma: {language_name}\n🕐 Horário diário: {time}\n🌍 Fuso horário: {tz}\n📬 Status: {status}\n\nO que você gostaria de alterar?",
-        "french": "⚙️ <b>Paramètres Actuels</b>\n\n🌐 Langue : {language_name}\n🕐 Heure quotidienne : {time}\n🌍 Fuseau horaire : {tz}\n📬 Statut : {status}\n\nQue voulez-vous modifier ?",
-        "italian": "⚙️ <b>Impostazioni Attuali</b>\n\n🌐 Lingua: {language_name}\n🕐 Orario giornaliero: {time}\n🌍 Fuso orario: {tz}\n📬 Stato: {status}\n\nCosa vuoi modificare?",
-        "german": "⚙️ <b>Aktuelle Einstellungen</b>\n\n🌐 Sprache: {language_name}\n🕐 Tägliche Zeit: {time}\n🌍 Zeitzone: {tz}\n📬 Status: {status}\n\nWas möchtest du ändern?",
-        "russian": "⚙️ <b>Текущие настройки</b>\n\n🌐 Язык: {language_name}\n🕐 Время отправки: {time}\n🌍 Часовой пояс: {tz}\n📬 Статус: {status}\n\nЧто хотите изменить?"
+        "english": "⚙️ <b>Current Settings</b>\n\n🌐 Language: {language_name}\n📊 Level: {difficulty}\n🕐 Daily time: {time}\n🌍 Timezone: {tz}\n📬 Status: {status}\n\nWhat would you like to change?",
+        "portuguese": "⚙️ <b>Configurações Atuais</b>\n\n🌐 Idioma: {language_name}\n📊 Nível: {difficulty}\n🕐 Horário diário: {time}\n🌍 Fuso horário: {tz}\n📬 Status: {status}\n\nO que você gostaria de alterar?",
+        "french": "⚙️ <b>Paramètres Actuels</b>\n\n🌐 Langue : {language_name}\n📊 Niveau : {difficulty}\n🕐 Heure quotidienne : {time}\n🌍 Fuseau horaire : {tz}\n📬 Statut : {status}\n\nQue voulez-vous modifier ?",
+        "italian": "⚙️ <b>Impostazioni Attuali</b>\n\n🌐 Lingua: {language_name}\n📊 Livello: {difficulty}\n🕐 Orario giornaliero: {time}\n🌍 Fuso orario: {tz}\n📬 Stato: {status}\n\nCosa vuoi modificare?",
+        "german": "⚙️ <b>Aktuelle Einstellungen</b>\n\n🌐 Sprache: {language_name}\n📊 Stufe: {difficulty}\n🕐 Tägliche Zeit: {time}\n🌍 Zeitzone: {tz}\n📬 Status: {status}\n\nWas möchtest du ändern?",
+        "russian": "⚙️ <b>Текущие настройки</b>\n\n🌐 Язык: {language_name}\n📊 Уровень: {difficulty}\n🕐 Время отправки: {time}\n🌍 Часовой пояс: {tz}\n📬 Статус: {status}\n\nЧто хотите изменить?"
     },
     "status_active": {
         "english": "Active",
