@@ -18,8 +18,9 @@ from telegram.ext import (
 
 import database as db
 from verbs import VERBS, get_verb_by_index, get_random_verb, get_verb_count
+from translations import get_text, TRANSLATIONS
 
-# Bot token - use environment variable or fallback
+# Bot token - use environment variable
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 # Logging
@@ -32,11 +33,11 @@ logger = logging.getLogger(__name__)
 # Supported languages for translation
 LANGUAGES = {
     'english': '🇬🇧 English',
-    'portuguese': '🇧🇷 Portuguese', 
-    'french': '🇫🇷 French',
-    'italian': '🇮🇹 Italian',
-    'german': '🇩🇪 German',
-    'russian': '🇷🇺 Russian'
+    'portuguese': '🇧🇷 Português', 
+    'french': '🇫🇷 Français',
+    'italian': '🇮🇹 Italiano',
+    'german': '🇩🇪 Deutsch',
+    'russian': '🇷🇺 Русский'
 }
 
 # Common timezones
@@ -57,21 +58,13 @@ TIMEZONES = {
 # Time options
 TIME_OPTIONS = ['07:00', '08:00', '09:00', '10:00', '12:00', '18:00', '20:00', '21:00']
 
-# Help message
-HELP_MESSAGE = """🇦🇷 <b>Spanish Verb Bot</b>
 
-I help you learn Argentinian Spanish verbs with daily practice and quizzes!
-
-<b>Available Commands:</b>
-
-/start - Set up or reset your preferences
-/verb - Get a random verb with conjugations
-/quiz - Test yourself on verbs you've learned
-/stats - See your learning progress
-/settings - Change language, time, or timezone
-/help - Show this help message
-
-Just tap a command or use the menu button! 📚"""
+def get_user_lang(user_id: int) -> str:
+    """Get user's language preference, default to English."""
+    user = db.get_user(user_id)
+    if user and user.get('language'):
+        return user['language']
+    return 'english'
 
 
 def format_verb_message(verb: dict, language: str) -> str:
@@ -110,13 +103,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db_user = db.get_user(user.id)
     
     if db_user and db_user['onboarding_complete']:
-        # User already set up
+        # User already set up - use their language
+        lang = db_user['language']
         await update.message.reply_text(
-            f"Welcome back! 🎉\n\n"
-            f"Use /verb to get a random verb\n"
-            f"Use /quiz to test yourself\n"
-            f"Use /settings to change your preferences\n"
-            f"Use /stats to see your progress"
+            get_text("welcome_back", lang),
+            parse_mode='HTML'
         )
         return
     
@@ -124,11 +115,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db.create_user(user.id, user.username)
     db.update_user(user.id, onboarding_step='language', onboarding_complete=0)
     
-    # Start onboarding - language selection
+    # Start onboarding - language selection (shown in English since no language chosen yet)
     await update.message.reply_text(
-        "Welcome! 🇦🇷 I'll send you an Argentinian Spanish verb every day.\n\n"
-        "Let's set things up!\n\n"
-        "<b>What language should I translate verbs to?</b>",
+        get_text("welcome_intro", "english"),
         parse_mode='HTML',
         reply_markup=get_language_keyboard()
     )
@@ -136,29 +125,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /help command."""
-    await update.message.reply_text(HELP_MESSAGE, parse_mode='HTML')
+    lang = get_user_lang(update.effective_user.id)
+    await update.message.reply_text(
+        get_text("help_message", lang), 
+        parse_mode='HTML'
+    )
 
 
 async def handle_unknown_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle any non-command text message."""
-    await update.message.reply_text(
-        "I only respond to commands! 🤖\n\n"
-        "Use the menu button or try these:\n\n"
-        "/verb - Get a verb\n"
-        "/quiz - Test yourself\n"
-        "/stats - Your progress\n"
-        "/settings - Preferences\n"
-        "/help - All commands"
-    )
+    lang = get_user_lang(update.effective_user.id)
+    await update.message.reply_text(get_text("unknown_message", lang))
 
 
 async def handle_file_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle file uploads (photos, documents, etc.)."""
-    await update.message.reply_text(
-        "I don't process files! 📁\n\n"
-        "I'm here to help you learn Spanish verbs.\n"
-        "Use /help to see available commands."
-    )
+    lang = get_user_lang(update.effective_user.id)
+    await update.message.reply_text(get_text("file_upload", lang))
 
 
 def get_language_keyboard():
@@ -208,9 +191,9 @@ async def handle_onboarding_callback(update: Update, context: ContextTypes.DEFAU
         language = data.replace('lang_', '')
         db.update_user(user_id, language=language, onboarding_step='timezone')
         
+        # Now use the selected language for all messages
         await query.edit_message_text(
-            f"Great! I'll translate verbs to {LANGUAGES[language]}.\n\n"
-            f"<b>What's your timezone?</b>",
+            get_text("language_selected", language, lang=LANGUAGES[language]),
             parse_mode='HTML',
             reply_markup=get_timezone_keyboard()
         )
@@ -220,9 +203,9 @@ async def handle_onboarding_callback(update: Update, context: ContextTypes.DEFAU
         timezone = data.replace('tz_', '')
         db.update_user(user_id, timezone=timezone, onboarding_step='time')
         
+        lang = user['language']
         await query.edit_message_text(
-            f"<b>What time should I send your daily verb?</b>\n\n"
-            f"(Time in your selected timezone)",
+            get_text("select_time", lang),
             parse_mode='HTML',
             reply_markup=get_time_keyboard()
         )
@@ -233,21 +216,16 @@ async def handle_onboarding_callback(update: Update, context: ContextTypes.DEFAU
         db.update_user(user_id, daily_time=daily_time, onboarding_complete=1, onboarding_step='done')
         
         user = db.get_user(user_id)
+        lang = user['language']
         
         # Schedule the daily job for this user
         schedule_user_daily_verb(context.application, user)
         
         await query.edit_message_text(
-            f"✅ <b>You're all set!</b>\n\n"
-            f"📚 Translation: {LANGUAGES[user['language']]}\n"
-            f"🕐 Daily verb at: {daily_time}\n"
-            f"🌍 Timezone: {user['timezone']}\n\n"
-            f"<b>Commands:</b>\n"
-            f"/verb - Get a random verb now\n"
-            f"/quiz - Test yourself on recent verbs\n"
-            f"/stats - See your progress\n"
-            f"/settings - Change your preferences\n\n"
-            f"Here's your first verb! 👇",
+            get_text("setup_complete", lang, 
+                     lang=LANGUAGES[user['language']], 
+                     time=daily_time, 
+                     tz=user['timezone']),
             parse_mode='HTML'
         )
         
@@ -259,11 +237,10 @@ async def verb_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /verb command - send a random verb."""
     user_id = update.effective_user.id
     user = db.get_user(user_id)
+    lang = get_user_lang(user_id)
     
     if not user or not user['onboarding_complete']:
-        await update.message.reply_text(
-            "Please complete setup first! Use /start"
-        )
+        await update.message.reply_text(get_text("setup_required", lang))
         return
     
     await send_verb_to_user(context.bot, user_id)
@@ -298,19 +275,17 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /quiz command."""
     user_id = update.effective_user.id
     user = db.get_user(user_id)
+    lang = get_user_lang(user_id)
     
     if not user or not user['onboarding_complete']:
-        await update.message.reply_text("Please complete setup first! Use /start")
+        await update.message.reply_text(get_text("setup_required", lang))
         return
     
     # Get recent verbs
     recent_indices = db.get_recent_verbs(user_id, limit=10)
     
     if len(recent_indices) < 1:
-        await update.message.reply_text(
-            "You need to learn more verbs first! 📚\n"
-            "Use /verb to get more verbs, then come back for the quiz."
-        )
+        await update.message.reply_text(get_text("quiz_need_verbs", lang))
         return
     
     # Pick a verb to quiz on
@@ -342,8 +317,8 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )])
         
         await update.message.reply_text(
-            f"🧠 <b>Quiz Time!</b>\n\n"
-            f"What does <b>{quiz_verb['infinitive']}</b> mean?",
+            get_text("quiz_title", lang) + 
+            get_text("quiz_meaning_question", lang, verb=quiz_verb['infinitive']),
             parse_mode='HTML',
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
@@ -373,7 +348,9 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         all_answers = [correct_answer] + wrong_answers
         random.shuffle(all_answers)
         
-        tense_names = {'presente': 'Present', 'pasado': 'Past', 'futuro': 'Future'}
+        # Translate tense name
+        tense_key = f"tense_{tense.replace('presente', 'present').replace('pasado', 'past').replace('futuro', 'future')}"
+        tense_name = get_text(tense_key, lang)
         
         keyboard = []
         for i, answer in enumerate(all_answers):
@@ -385,9 +362,9 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )])
         
         await update.message.reply_text(
-            f"🧠 <b>Quiz Time!</b>\n\n"
-            f"<b>{quiz_verb['infinitive'].upper()}</b>\n\n"
-            f"What is the <b>{tense_names[tense]}</b> tense for <b>{pronoun}</b>?",
+            get_text("quiz_title", lang) +
+            f"<b>{quiz_verb['infinitive'].upper()}</b>\n\n" +
+            get_text("quiz_conjugation_question", lang, tense=tense_name, pronoun=pronoun),
             parse_mode='HTML',
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
@@ -399,6 +376,7 @@ async def handle_quiz_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     await query.answer()
     
     user_id = query.from_user.id
+    lang = get_user_lang(user_id)
     parts = query.data.split('_')
     # quiz_{verb_index}_{type}_{is_correct}
     verb_index = int(parts[1])
@@ -410,8 +388,7 @@ async def handle_quiz_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     
     if is_correct:
         await query.edit_message_text(
-            "✅ <b>Correct!</b> Great job! 🎉\n\n"
-            "Use /quiz for another question or /verb for a new verb.",
+            get_text("quiz_correct", lang),
             parse_mode='HTML'
         )
     else:
@@ -420,9 +397,7 @@ async def handle_quiz_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         translation = verb['translations'][user['language']]
         
         await query.edit_message_text(
-            f"❌ <b>Not quite!</b>\n\n"
-            f"<b>{verb['infinitive']}</b> = {translation}\n\n"
-            f"Keep practicing! Use /quiz for another question.",
+            get_text("quiz_incorrect", lang, verb=verb['infinitive'], translation=translation),
             parse_mode='HTML'
         )
 
@@ -431,20 +406,22 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /stats command."""
     user_id = update.effective_user.id
     user = db.get_user(user_id)
+    lang = get_user_lang(user_id)
     
     if not user:
-        await update.message.reply_text("Please use /start first!")
+        await update.message.reply_text(get_text("use_start", lang))
         return
     
     stats = db.get_quiz_stats(user_id)
     sent_count = len(db.get_sent_verb_indices(user_id))
     
     await update.message.reply_text(
-        f"📊 <b>Your Progress</b>\n\n"
-        f"📚 Verbs learned: {sent_count}/{get_verb_count()}\n"
-        f"🧠 Quiz attempts: {stats['total']}\n"
-        f"✅ Correct answers: {stats['correct']}\n"
-        f"📈 Success rate: {stats['percentage']}%",
+        get_text("stats_title", lang,
+                 learned=sent_count,
+                 total=get_verb_count(),
+                 attempts=stats['total'],
+                 correct=stats['correct'],
+                 rate=stats['percentage']),
         parse_mode='HTML'
     )
 
@@ -453,25 +430,31 @@ async def settings_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /settings command."""
     user_id = update.effective_user.id
     user = db.get_user(user_id)
+    lang = get_user_lang(user_id)
     
     if not user:
-        await update.message.reply_text("Please use /start first!")
+        await update.message.reply_text(get_text("use_start", lang))
         return
     
+    # Get translated status
+    status = get_text("status_active", lang) if user['is_active'] else get_text("status_paused", lang)
+    
+    # Get translated button labels
+    pause_btn = get_text("btn_resume", lang) if not user['is_active'] else get_text("btn_pause", lang)
+    
     keyboard = [
-        [InlineKeyboardButton("🌐 Change Language", callback_data="settings_language")],
-        [InlineKeyboardButton("🕐 Change Time", callback_data="settings_time")],
-        [InlineKeyboardButton("🌍 Change Timezone", callback_data="settings_timezone")],
-        [InlineKeyboardButton("⏸️ Pause Daily Verbs", callback_data="settings_pause")],
+        [InlineKeyboardButton(get_text("btn_change_language", lang), callback_data="settings_language")],
+        [InlineKeyboardButton(get_text("btn_change_time", lang), callback_data="settings_time")],
+        [InlineKeyboardButton(get_text("btn_change_timezone", lang), callback_data="settings_timezone")],
+        [InlineKeyboardButton(pause_btn, callback_data="settings_pause")],
     ]
     
     await update.message.reply_text(
-        f"⚙️ <b>Current Settings</b>\n\n"
-        f"🌐 Language: {LANGUAGES[user['language']]}\n"
-        f"🕐 Daily time: {user['daily_time']}\n"
-        f"🌍 Timezone: {user['timezone']}\n"
-        f"📬 Status: {'Active' if user['is_active'] else 'Paused'}\n\n"
-        f"What would you like to change?",
+        get_text("settings_title", lang,
+                 lang=LANGUAGES[user['language']],
+                 time=user['daily_time'],
+                 tz=user['timezone'],
+                 status=status),
         parse_mode='HTML',
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
@@ -484,10 +467,11 @@ async def handle_settings_callback(update: Update, context: ContextTypes.DEFAULT
     
     user_id = query.from_user.id
     data = query.data
+    lang = get_user_lang(user_id)
     
     if data == "settings_language":
         await query.edit_message_text(
-            "Select your new translation language:",
+            get_text("select_language", lang),
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(name, callback_data=f"setlang_{code}")]
                 for code, name in LANGUAGES.items()
@@ -496,13 +480,13 @@ async def handle_settings_callback(update: Update, context: ContextTypes.DEFAULT
     
     elif data == "settings_time":
         await query.edit_message_text(
-            "Select your new daily time:",
+            get_text("select_time", lang),
             reply_markup=get_time_keyboard_settings()
         )
     
     elif data == "settings_timezone":
         await query.edit_message_text(
-            "Select your timezone:",
+            get_text("select_timezone", lang),
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(name, callback_data=f"settz_{code}")]
                 for code, name in TIMEZONES.items()
@@ -514,18 +498,17 @@ async def handle_settings_callback(update: Update, context: ContextTypes.DEFAULT
         new_status = 0 if user['is_active'] else 1
         db.update_user(user_id, is_active=new_status)
         
-        status_text = "resumed" if new_status else "paused"
-        await query.edit_message_text(
-            f"✅ Daily verbs have been {status_text}!\n\n"
-            f"Use /settings to change this anytime."
-        )
+        if new_status:
+            await query.edit_message_text(get_text("verbs_resumed", lang))
+        else:
+            await query.edit_message_text(get_text("verbs_paused", lang))
     
     elif data.startswith("setlang_"):
         language = data.replace("setlang_", "")
         db.update_user(user_id, language=language)
+        # Use the NEW language for confirmation message
         await query.edit_message_text(
-            f"✅ Language changed to {LANGUAGES[language]}!\n\n"
-            f"Use /settings to make more changes."
+            get_text("language_changed", language, lang=LANGUAGES[language])
         )
     
     elif data.startswith("settime_"):
@@ -537,8 +520,7 @@ async def handle_settings_callback(update: Update, context: ContextTypes.DEFAULT
         schedule_user_daily_verb(context.application, user)
         
         await query.edit_message_text(
-            f"✅ Daily time changed to {new_time}!\n\n"
-            f"Use /settings to make more changes."
+            get_text("time_changed", lang, time=new_time)
         )
     
     elif data.startswith("settz_"):
@@ -549,10 +531,7 @@ async def handle_settings_callback(update: Update, context: ContextTypes.DEFAULT
         user = db.get_user(user_id)
         schedule_user_daily_verb(context.application, user)
         
-        await query.edit_message_text(
-            f"✅ Timezone changed!\n\n"
-            f"Use /settings to make more changes."
-        )
+        await query.edit_message_text(get_text("timezone_changed", lang))
 
 
 def get_time_keyboard_settings():
