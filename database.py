@@ -26,12 +26,19 @@ def init_db():
             language TEXT DEFAULT 'english',
             timezone TEXT DEFAULT 'UTC',
             daily_time TEXT DEFAULT '09:00',
+            difficulty TEXT DEFAULT 'beginner',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             is_active INTEGER DEFAULT 1,
             onboarding_complete INTEGER DEFAULT 0,
             onboarding_step TEXT DEFAULT 'language'
         )
     ''')
+    
+    # Add difficulty column if it doesn't exist (for existing databases)
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN difficulty TEXT DEFAULT "beginner"')
+    except:
+        pass  # Column already exists
     
     # Sent verbs table (to track which verbs were sent to each user)
     cursor.execute('''
@@ -90,7 +97,7 @@ def update_user(user_id: int, **kwargs) -> dict:
     cursor = conn.cursor()
     
     valid_fields = ['language', 'timezone', 'daily_time', 'is_active', 
-                    'onboarding_complete', 'onboarding_step']
+                    'onboarding_complete', 'onboarding_step', 'difficulty']
     
     updates = {k: v for k, v in kwargs.items() if k in valid_fields}
     
